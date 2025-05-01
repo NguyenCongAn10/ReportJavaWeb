@@ -1,0 +1,56 @@
+package dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import model.TinTuc;
+
+public class TinTucDAO {
+
+    // Lấy danh sách tin tức theo trang
+    public List<TinTuc> getTinTucByPage(int page, int pageSize) {
+        List<TinTuc> tinTucs = new ArrayList<>();
+        String sql = "SELECT * FROM TinTuc ORDER BY ngayDang DESC LIMIT ? OFFSET ?";
+        int offset = (page - 1) * pageSize;
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, pageSize);
+            stmt.setInt(2, offset);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                TinTuc tinTuc = new TinTuc();
+                tinTuc.setMaTinTuc(rs.getInt("maTinTuc"));
+                tinTuc.setTieuDe(rs.getString("tieuDe"));
+                tinTuc.setNoiDung(rs.getString("noiDung"));
+                tinTuc.setNgayDang(rs.getDate("ngayDang"));
+                tinTuc.setMaSanPham(rs.getInt("maSanPham"));
+                tinTucs.add(tinTuc);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error retrieving tin tuc: " + e.getMessage(), e);
+        }
+        return tinTucs;
+    }
+
+    // Lấy tổng số tin tức
+    public int getTotalTinTuc() {
+        String sql = "SELECT COUNT(*) FROM TinTuc";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error counting tin tuc: " + e.getMessage(), e);
+        }
+        return 0;
+    }
+}
