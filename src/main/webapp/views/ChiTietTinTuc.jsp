@@ -1,13 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List"%>
-<%@ page import="model.*"%>
+<%@ page import="model.TinTuc"%>
 <%@ page import="java.text.SimpleDateFormat"%>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Danh sách Tin Tức</title>
+    <title>Chi tiết Tin Tức</title>
 
     <!-- Bootstrap CSS từ CDN -->
     <link rel="stylesheet"
@@ -86,7 +85,7 @@
                                 </li>
                                 <li class="nav-item"><a class="nav-link" href="#">Giới Thiệu</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#">Sản phẩm đã giao</a></li>
-                                <li class="nav-item active"><a class="nav-link" href="#">Tin tức<span class="sr-only">(current)</span></a></li>
+                                <li class="nav-item active"><a class="nav-link" href="<%=request.getContextPath()%>/tin-tuc">Tin tức<span class="sr-only">(current)</span></a></li>
                                 <li class="nav-item"><a class="nav-link" href="#">Facebook</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#">Liên hệ</a></li>
                             </ul>
@@ -100,78 +99,29 @@
     <!-- Kết thúc header -->
 
     <div class="main-wrapper">
-        <section class="news">
-            <h3 class="title-page">TIN TỨC</h3>
+        <section class="news-detail">
             <div class="container">
-                <div class="list-box row">
-                    <%
-                    List<TinTuc> tinTucs = (List<TinTuc>) request.getAttribute("tinTucs");
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                    if (tinTucs != null) {
-                        for (TinTuc tinTuc : tinTucs) {
-                    %>
-                    <div class="col-md-4">
-                        <div class="box-item">
-                            <div class="content-box">
-                                <h4>
-                                    <a href="<%=request.getContextPath()%>/chi-tiet-tin-tuc?maTinTuc=<%=tinTuc.getMaTinTuc()%>">
-                                        <%=tinTuc.getTieuDe()%>
-                                    </a>
-                                </h4>
-                                <p class="mb-0">
-                                    Ngày đăng: <%=dateFormat.format(tinTuc.getNgayDang())%>
-                                </p>
-                                <p>
-                                    <%=tinTuc.getNoiDung().length() > 100 ? tinTuc.getNoiDung().substring(0, 100) + "..." : tinTuc.getNoiDung()%>
-                                </p>
-                            </div>
-                            <a href="<%=request.getContextPath()%>/chi-tiet-tin-tuc?maTinTuc=<%=tinTuc.getMaTinTuc()%>" class="add-to-cart">Xem chi tiết</a>
-                        </div>
-                    </div>
-                    <%
-                        }
-                    }
-                    %>
+                <%
+                TinTuc tinTuc = (TinTuc) request.getAttribute("tinTuc");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                if (tinTuc != null) {
+                %>
+                <h1 class="title-page"><%=tinTuc.getTieuDe()%></h1>
+                <p class="text-muted mb-4">
+                    Ngày đăng: <%=dateFormat.format(tinTuc.getNgayDang())%>
+                </p>
+                <div class="content">
+                    <p><%=tinTuc.getNoiDung()%></p>
                 </div>
+                <%
+                } else {
+                %>
+                <p class="text-danger">Không tìm thấy tin tức.</p>
+                <%
+                }
+                %>
+                <a href="<%=request.getContextPath()%>/tin-tuc" class="btn btn-primary mt-3">Quay lại danh sách tin tức</a>
             </div>
-            <!-- Phân trang -->
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center">
-                    <%
-                    Integer currentPage = (Integer) request.getAttribute("currentPage");
-                    Integer totalPages = (Integer) request.getAttribute("totalPages");
-
-                    if (currentPage == null) currentPage = 1;
-                    if (totalPages == null) totalPages = 1;
-
-                    // Nút trang trước
-                    if (currentPage > 1) {
-                    %>
-                    <li class="page-item"><a class="page-link"
-                                             href="tin-tuc?page=<%=currentPage - 1%>">«</a></li>
-                    <%
-                    }
-
-                    // Các số trang
-                    for (int i = 1; i <= totalPages; i++) {
-                    %>
-                    <li class="page-item <%=(i == currentPage ? "active" : "")%>">
-                        <a class="page-link" href="tin-tuc?page=<%=i%>"><%=i%></a>
-                    </li>
-                    <%
-                    }
-
-                    // Nút trang sau
-                    if (currentPage < totalPages) {
-                    %>
-                    <li class="page-item"><a class="page-link"
-                                             href="tin-tuc?page=<%=currentPage + 1%>">»</a></li>
-                    <%
-                    }
-                    %>
-                </ul>
-            </nav>
-            <!-- Kết thúc phân trang -->
         </section>
     </div>
 

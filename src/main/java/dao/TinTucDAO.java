@@ -53,4 +53,26 @@ public class TinTucDAO {
         }
         return 0;
     }
+    public TinTuc getTinTucById(int maTinTuc) {
+        String sql = "SELECT * FROM TinTuc WHERE maTinTuc = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, maTinTuc);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                TinTuc tinTuc = new TinTuc();
+                tinTuc.setMaTinTuc(rs.getInt("maTinTuc"));
+                tinTuc.setTieuDe(rs.getString("tieuDe"));
+                tinTuc.setNoiDung(rs.getString("noiDung"));
+                tinTuc.setNgayDang(rs.getDate("ngayDang"));
+                tinTuc.setMaSanPham(rs.getInt("maSanPham"));
+                return tinTuc;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error retrieving tin tuc by id: " + e.getMessage(), e);
+        }
+        return null; // Trả về null nếu không tìm thấy tin tức
+    }
 }
